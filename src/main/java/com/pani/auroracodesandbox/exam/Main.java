@@ -3,7 +3,7 @@ package com.pani.auroracodesandbox.exam;
 /**
  * @author Pani
  * @date Created in 2024/3/9 14:33
- * @description
+ * @description 提交的代码 示例
  */
 public class Main {
     public static void main(String[] args) {

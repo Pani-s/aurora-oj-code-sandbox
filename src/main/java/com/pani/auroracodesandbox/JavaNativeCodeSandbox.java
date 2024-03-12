@@ -22,16 +22,36 @@ import java.util.List;
  */
 @Slf4j
 public class JavaNativeCodeSandbox implements CodeSandbox {
+    /**
+     * 存放用户临时代码的总目录的名字
+     */
     private static final String GLOBAL_CODE_DIR_NAME = "tmpCode";
     //发现有psf的快捷键
+    /**
+     * 用户代码 统一为类名叫 Main的java文件
+     */
     public static final String GLOBAL_JAVA_CLASS_NAME = "Main.java";
+
+    /**
+     * 存放用户临时代码的总目录的path路径
+     */
     private static String globalCodeDirPath;
+
+    /**
+     * 目前定死的执行最大时间 limit 不然超时
+     */
     private static final long TIME_OUT = 5000L;
 
+    /**
+     * java security manager
+     */
     private static final String SECURITY_MANAGER_PATH = "D:\\3Code\\00Fish\\aurora-oj\\code\\aurora-code-sandbox\\src\\main\\resources\\security";
 
     private static final String SECURITY_MANAGER_CLASS_NAME = "MySecurityManager";
 
+    /**
+     * 黑名单 比如使用了IO包下的类
+     */
     private static final List<String> blackList = Arrays.asList("Files", "exec");
 
     /**

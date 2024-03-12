@@ -40,6 +40,20 @@
             <artifactId>hutool-all</artifactId>
             <version>5.8.9</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.github.docker-java/docker-java -->
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.docker-java/docker-java-transport-httpclient5 -->
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java-transport-httpclient5</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -71,7 +85,7 @@
                 <version>${spring-boot.version}</version>
                 <configuration>
                     <mainClass>com.pani.auroracodesandbox.AuroraCodeSandboxApplication</mainClass>
-                    <skip>true</skip>
+                    <!--<skip>true</skip>-->
                 </configuration>
                 <executions>
                     <execution>
