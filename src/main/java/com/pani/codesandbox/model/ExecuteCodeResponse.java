@@ -1,4 +1,4 @@
-package com.pani.auroracodesandbox.model;
+package com.pani.codesandbox.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,7 +27,7 @@ public class ExecuteCodeResponse {
     private String message;
 
     /**
-     * 执行状态
+     * 执行状态 0正常结束 1编译错误 2运行错误
      */
     private Integer status;
 

@@ -1,4 +1,4 @@
-package com.pani.auroracodesandbox.security;
+package com.pani.codesandbox.security;
 
 import cn.hutool.core.io.FileUtil;
 

@@ -1,4 +1,4 @@
-package com.pani.auroracodesandbox.docker;
+package com.pani.codesandbox.docker;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.PullImageCmd;

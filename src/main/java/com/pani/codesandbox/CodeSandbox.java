@@ -1,7 +1,7 @@
-package com.pani.auroracodesandbox;
+package com.pani.codesandbox;
 
-import com.pani.auroracodesandbox.model.ExecuteCodeRequest;
-import com.pani.auroracodesandbox.model.ExecuteCodeResponse;
+import com.pani.codesandbox.model.ExecuteCodeRequest;
+import com.pani.codesandbox.model.ExecuteCodeResponse;
 
 /**
  * @author Pani

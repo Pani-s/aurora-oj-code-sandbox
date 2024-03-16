@@ -1,4 +1,4 @@
-package com.pani.auroracodesandbox.model;
+package com.pani.codesandbox.model;
 
 import lombok.Data;
 
@@ -24,4 +24,9 @@ public class JudgeInfo {
      * 消耗时间（KB）
      */
     private Long time;
+
+    /**
+     * 执行的详细信息
+     */
+    private String details;
 }

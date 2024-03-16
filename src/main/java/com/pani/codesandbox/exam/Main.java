@@ -1,4 +1,4 @@
-package com.pani.auroracodesandbox.exam;
+package com.pani.codesandbox.exam;
 
 /**
  * @author Pani

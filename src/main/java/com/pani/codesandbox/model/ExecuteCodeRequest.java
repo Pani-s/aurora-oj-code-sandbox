@@ -1,4 +1,4 @@
-package com.pani.auroracodesandbox.model;
+package com.pani.codesandbox.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

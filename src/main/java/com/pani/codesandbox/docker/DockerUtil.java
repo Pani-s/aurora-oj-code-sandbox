@@ -1,4 +1,4 @@
-package com.pani.auroracodesandbox.docker;
+package com.pani.codesandbox.docker;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.github.dockerjava.api.DockerClient;

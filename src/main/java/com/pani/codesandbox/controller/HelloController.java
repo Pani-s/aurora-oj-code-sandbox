@@ -1,4 +1,4 @@
-package com.pani.auroracodesandbox.controller;
+package com.pani.codesandbox.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date Created in 2024/3/10 10:02
  * @description
  */
-@RestController("/")
+@RestController("/hi")
 public class HelloController {
     @GetMapping("/hi")
     public String hi(){

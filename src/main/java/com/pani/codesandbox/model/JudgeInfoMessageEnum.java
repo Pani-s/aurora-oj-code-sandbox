@@ -1,4 +1,4 @@
-package com.pani.auroracodesandbox.model;
+package com.pani.codesandbox.model;
 
 
 import org.springframework.util.ObjectUtils;
