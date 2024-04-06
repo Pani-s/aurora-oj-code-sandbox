@@ -139,7 +139,7 @@ public class DockerUtil {
             PullImageResultCallback exec = new PullImageResultCallback() {
                 @Override
                 public void onNext(PullResponseItem item) {
-                    System.out.println(item.getStatus());
+                    log.info("item.getStatus() = {}",item.getStatus());
                 }
             };
             PullImageCmd pullImageCmd = dockerClient.pullImageCmd(tag);

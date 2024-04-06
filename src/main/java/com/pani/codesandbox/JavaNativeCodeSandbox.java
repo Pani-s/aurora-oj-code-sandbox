@@ -77,14 +77,14 @@ public class JavaNativeCodeSandbox extends JavaCodeSandboxTemplate implements Co
                 new Thread(() -> {
                     try {
                         Thread.sleep(TIME_OUT);
-                        System.out.println("超时了，中断");
+                        log.error("超时了，中断");
                         runProcess.destroy();
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                 }).start();
                 ExecuteMessage executeMessage = ProcessUtils.runProcessAndGetMessage(runProcess, "运行");
-                System.err.println(executeMessage);
+                log.info("executeMessage{}",executeMessage);
                 executeMessageList.add(executeMessage);
             } catch (Exception e) {
                 throw new RuntimeException("执行错误", e);

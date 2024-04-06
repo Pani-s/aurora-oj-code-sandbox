@@ -3,6 +3,7 @@ package com.pani.codesandbox;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.StrUtil;
+import com.pani.codesandbox.exception.TLEException;
 import com.pani.codesandbox.model.*;
 import com.pani.codesandbox.utils.ProcessUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +42,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
     /**
      * 目前定死的执行最大时间 limit 不然超时
      */
-    protected static final long TIME_OUT = 5000L;
+    protected static final long TIME_OUT = 2L;
 
     static {
         /*
@@ -61,6 +62,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
         List<String> inputList = executeCodeRequest.getInputList();
         String code = executeCodeRequest.getCode();
         String language = executeCodeRequest.getLanguage();
+
         ExecuteCodeResponse executeCodeResponse = new ExecuteCodeResponse();
 
         //1. 把用户的代码保存为文件（都存放在Tmp Code 目录下）
@@ -68,42 +70,55 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
 
         //2. 编译代码，得到 class 字节码
         ExecuteMessage compileFileExecuteMessage = compileFile(userCodeFile);
-        System.out.println(compileFileExecuteMessage);
+        log.info("compileFileExecuteMessage:{}", compileFileExecuteMessage);
         int exitValue = compileFileExecuteMessage.getExitValue();
         String errorMessage = compileFileExecuteMessage.getErrorMessage();
         if (exitValue != 0) {
             JudgeInfo judgeInfo = new JudgeInfo();
             judgeInfo.setMessage(JudgeInfoMessageEnum.COMPILE_ERROR.getValue());
-            judgeInfo.setDetails("代码编译失败！");
+            judgeInfo.setDetails("代码编译失败！" + errorMessage);
             executeCodeResponse.setJudgeInfo(judgeInfo);
-            executeCodeResponse.setMessage("代码编译失败！" + errorMessage);
+            //            executeCodeResponse.setMessage("代码编译失败！" + errorMessage);
             executeCodeResponse.setStatus(1);
-            log.info(executeCodeResponse.toString());
+            log.info("编译错误退出，executeCodeResponse:{}", executeCodeResponse);
             return executeCodeResponse;
         }
 
         // 3. 执行代码，得到输出结果（子类这里不同）
         List<ExecuteMessage> executeMessageList = null;
-        try{
+        try {
             executeMessageList = runFile(userCodeFile, inputList);
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             JudgeInfo judgeInfo = new JudgeInfo();
-            judgeInfo.setMessage(JudgeInfoMessageEnum.RUNTIME_ERROR.getValue());
-            judgeInfo.setDetails("代码运行异常");
-            executeCodeResponse.setJudgeInfo(judgeInfo);
-            executeCodeResponse.setMessage("代码运行异常");
-            executeCodeResponse.setStatus(1);
-            log.info(executeCodeResponse.toString());
+            if (e instanceof TLEException) {
+                judgeInfo.setMessage(JudgeInfoMessageEnum.TIME_LIMIT_EXCEEDED.getValue());
+                judgeInfo.setDetails("代码运行超时");
+                executeCodeResponse.setJudgeInfo(judgeInfo);
+                //                executeCodeResponse.setMessage("代码运行超时");
+                executeCodeResponse.setStatus(2);
+            } else {
+                judgeInfo.setMessage(JudgeInfoMessageEnum.RUNTIME_ERROR.getValue());
+                judgeInfo.setDetails("代码运行异常:" + e.getMessage());
+                executeCodeResponse.setJudgeInfo(judgeInfo);
+                //                executeCodeResponse.setMessage("代码运行异常:" + e.getMessage());
+                executeCodeResponse.setStatus(2);
+                log.info("代码运行异常,executeCodeResponse={}", executeCodeResponse);
+            }
             return executeCodeResponse;
         }
 
         //4. 对比，收集整理输出结果
-        ExecuteCodeResponse outputResponse = getOutputResponse(executeMessageList);
+        ExecuteCodeResponse outputResponse = null;
+        if (this instanceof JavaDockerCodeSandbox) {
+            outputResponse = getOutputResponseNew(executeMessageList);
+        } else {
+            outputResponse = getOutputResponse(executeMessageList);
+        }
 
         //5. 文件清理，删除
         boolean b = deleteFile(userCodeFile);
         if (!b) {
-            log.error("deleteFile error, userCodeFilePath = {}", userCodeFile.getAbsolutePath());
+            log.error("文件清理失败, userCodeFilePath = {}", userCodeFile.getAbsolutePath());
         }
         return outputResponse;
     }
@@ -175,7 +190,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
                 judgeInfo.setMessage(JudgeInfoMessageEnum.RUNTIME_ERROR.getValue());
                 judgeInfo.setDetails(errorMessage);
                 executeCodeResponse.setJudgeInfo(judgeInfo);
-                executeCodeResponse.setMessage(errorMessage);
+                //                executeCodeResponse.setMessage(errorMessage);
                 // 用户提交的代码执行中存在错误
                 executeCodeResponse.setStatus(2);
                 break;
@@ -205,6 +220,46 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
         return executeCodeResponse;
     }
 
+    /**
+     * 4、获取输出结果 --- ACM专版
+     *
+     * @param executeMessageList
+     * @return
+     */
+    public ExecuteCodeResponse getOutputResponseNew(List<ExecuteMessage> executeMessageList) {
+        ExecuteCodeResponse executeCodeResponse = new ExecuteCodeResponse();
+        List<String> outputList = new ArrayList<>();
+        ExecuteMessage executeMessage = executeMessageList.get(0);
+        String errorMessage = executeMessage.getErrorMessage();
+        if (StrUtil.isNotBlank(errorMessage)) {
+            //有错
+            executeCodeResponse.setStatus(2);
+
+            JudgeInfo judgeInfo = new JudgeInfo();
+            judgeInfo.setMessage(JudgeInfoMessageEnum.RUNTIME_ERROR.getValue());
+            judgeInfo.setDetails(errorMessage);
+            executeCodeResponse.setJudgeInfo(judgeInfo);
+            outputList.add(executeMessage.getMessage());
+            executeCodeResponse.setOutputList(outputList);
+            //            executeCodeResponse.setMessage(errorMessage);
+            // 用户提交的代码执行中存在错误
+
+        } else {
+            //通过，设定时间空间
+            executeCodeResponse.setStatus(0);
+            outputList.add(executeMessage.getMessage());
+            executeCodeResponse.setOutputList(outputList);
+
+            Long time = executeMessage.getTime();
+            Long memory = executeMessage.getMemory();
+            JudgeInfo judgeInfo = new JudgeInfo();
+            judgeInfo.setTime(time);
+            judgeInfo.setMemory(memory);
+            executeCodeResponse.setJudgeInfo(judgeInfo);
+        }
+        return executeCodeResponse;
+    }
+
 
     /**
      * 5、删除文件
@@ -217,7 +272,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
             String userCodeParentPath = userCodeFile.getParentFile().getAbsolutePath();
             boolean del = FileUtil.del(userCodeParentPath);
             //用err是因为红字注目一点 XP
-            System.err.println("删除" + (del ? "成功" : "失败"));
+            log.error("删除" + (del ? "成功" : "失败"));
             return del;
         }
         return true;
@@ -232,7 +287,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
     protected ExecuteCodeResponse getErrorResponse(Throwable e) {
         ExecuteCodeResponse executeCodeResponse = new ExecuteCodeResponse();
         executeCodeResponse.setOutputList(new ArrayList<>());
-        executeCodeResponse.setMessage(e.getMessage());
+        //        executeCodeResponse.setMessage(e.getMessage());
         // 表示代码沙箱错误
         executeCodeResponse.setStatus(2);
         executeCodeResponse.setJudgeInfo(new JudgeInfo());

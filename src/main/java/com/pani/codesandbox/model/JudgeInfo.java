@@ -3,7 +3,7 @@ package com.pani.codesandbox.model;
 import lombok.Data;
 
 /**
- * @author Pani
+ * @athor Pani
  * @date Created in 2024/3/6 16:50
  * @description 判题信息
  */

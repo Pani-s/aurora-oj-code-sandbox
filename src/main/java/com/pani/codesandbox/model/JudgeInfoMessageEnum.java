@@ -24,7 +24,7 @@ public enum JudgeInfoMessageEnum {
     WRONG_ANSWER("答案错误", "Wrong Answer"),
     COMPILE_ERROR("编译错误", "Compile Error"),
     MEMORY_LIMIT_EXCEEDED("内存溢出", "Memory Limit Exceeded"),
-    TIME_LIMIT_EXCEEDED("超时", "超时Time Limit Exceeded"),
+    TIME_LIMIT_EXCEEDED("超时", "Time Limit Exceeded"),
 
     PRESENTATION_ERROR("展示错误", "Presentation Error"),
     //比如答案没错，但是多了空格

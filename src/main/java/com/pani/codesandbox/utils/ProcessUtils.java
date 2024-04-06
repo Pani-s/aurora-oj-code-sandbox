@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StopWatch;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Pani
@@ -29,7 +30,7 @@ public class ProcessUtils {
             int exitValue = process.waitFor();
             executeMessage.setExitValue(exitValue);
             if (exitValue == 0) {
-                System.err.println(opType + "成功");
+                log.info(opType + "成功");
                 // 分批获取进程的正常输出
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 StringBuilder compileOutputStringBuilder = new StringBuilder();
@@ -41,10 +42,10 @@ public class ProcessUtils {
                 executeMessage.setMessage(compileOutputStringBuilder.toString());
                 //                System.out.println(compileOutputStringBuilder);
             } else {
-                System.err.println(opType + "失败！错误码：" + exitValue);
+                log.error(opType + "失败！错误码：" + exitValue);
 
                 // 分批获取进程的正常输出
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
                 StringBuilder compileOutputStringBuilder = new StringBuilder();
                 // 逐行读取
                 String compileOutputLine;
@@ -54,7 +55,7 @@ public class ProcessUtils {
                 executeMessage.setMessage(compileOutputStringBuilder.toString());
 
                 // 分批获取进程的错误输出
-                BufferedReader errorBufferedReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+                BufferedReader errorBufferedReader = new BufferedReader(new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8));
                 StringBuilder errorCompileOutputStringBuilder = new StringBuilder();
                 // 逐行读取
                 String errorCompileOutputLine;
